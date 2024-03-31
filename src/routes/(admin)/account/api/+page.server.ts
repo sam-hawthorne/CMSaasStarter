@@ -201,6 +201,11 @@ export const actions = {
     const fullName = formData.get("fullName") as string
     const companyName = formData.get("companyName") as string
     const website = formData.get("website") as string
+    // Extracting product information from the form data
+    const productName = formData.get("productName") as string;
+    const productDescription = formData.get("productDescription") as string;
+    const productCost = formData.get("productCost") ? parseFloat(formData.get("productCost") as string) : null;
+
 
     let validationError
     const fieldMaxTextLength = 50
@@ -235,23 +240,50 @@ export const actions = {
         fullName,
         companyName,
         website,
+        productName,
+        productDescription,
+        productCost,
       })
     }
+    if (!productName) {
+      validationError = "Product name is required";
+      errorFields.push("productName");
+    } else if (productName.length > 100) { // Assuming a max length of 100 for product name
+      validationError = "Product name must be less than 100 characters";
+      errorFields.push("productName");
+    }
+    if (!productDescription) {
+      validationError = "Product description is required";
+      errorFields.push("productDescription");
+    } else if (productDescription.length > 500) { // Assuming a max length of 500 for product description
+      validationError = "Product description must be less than 500 characters";
+      errorFields.push("productDescription");
+    }
+    if (productCost !== null && isNaN(productCost)) {
+      validationError = "Product cost must be a valid number";
+      errorFields.push("productCost");
+    }
 
-    const { error } = await supabase.from("profiles").upsert({
-      id: session?.user.id,
-      full_name: fullName,
-      company_name: companyName,
-      website: website,
-      updated_at: new Date(),
-    })
+    // @ts-ignore
+    const { error: transactionError } = await supabase.rpc('update_profile_and_product', {
+      _user_id: session.user.id,
+      _full_name: fullName,
+      _company_name: companyName,
+      _website: website,
+      _product_name: productName,
+      _product_description: productDescription,
+      _product_cost: productCost,
+    });
 
-    if (error) {
+    if (transactionError) {
       return fail(500, {
         errorMessage: "Unknown error. If this persists please contact us.",
         fullName,
         companyName,
         website,
+        productName,
+        productDescription,
+        productCost,
       })
     }
 
@@ -259,6 +291,9 @@ export const actions = {
       fullName,
       companyName,
       website,
+      productName,
+      productDescription,
+      productCost,
     }
   },
   signout: async ({ locals: { supabase, getSession } }) => {

@@ -70,3 +70,38 @@ create policy "Avatar images are publicly accessible." on storage.objects
 
 create policy "Anyone can upload an avatar." on storage.objects
   for insert with check (bucket_id = 'avatars');
+
+  -- Create a table for products
+CREATE TABLE products (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  profile_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  updated_at TIMESTAMP WITH TIME ZONE,
+  product_name TEXT,
+  description TEXT,
+  product_cost NUMERIC(10,2), -- Adjust precision and scale as needed
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Automatically set updated_at to current time on product update
+CREATE OR REPLACE FUNCTION update_modified_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER set_product_updated_at BEFORE UPDATE ON products
+FOR EACH ROW EXECUTE FUNCTION update_modified_column();
+
+-- Add Row Level Security (RLS) to the products table
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Products are viewable by their profile owner." ON products
+FOR SELECT USING (EXISTS (SELECT 1 FROM profiles WHERE id = profile_id AND auth.uid() = id));
+
+CREATE POLICY "Profile owners can insert products." ON products
+FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM profiles WHERE id = profile_id AND auth.uid() = id));
+
+CREATE POLICY "Profile owners can update their products." ON products
+FOR UPDATE USING (EXISTS (SELECT 1 FROM profiles WHERE id = profile_id AND auth.uid() = id));

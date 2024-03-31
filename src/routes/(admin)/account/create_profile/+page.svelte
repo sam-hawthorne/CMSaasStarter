@@ -12,6 +12,10 @@
   let fullName: string = profile?.full_name ?? ""
   let companyName: string = profile?.company_name ?? ""
   let website: string = profile?.website ?? ""
+  // Initialize state for new product fields
+  let productName: string = ""
+  let productDescription: string = ""
+  let productCost: number | string = "" // Could be empty initially
 
   const fieldError = (liveForm: FormAccountUpdateResult, name: string) => {
     let errors = liveForm?.errorFields ?? []
@@ -92,6 +96,55 @@
               : ''} mt-1 input input-bordered w-full max-w-xs"
             value={form?.website ?? website}
             maxlength="50"
+          />
+        </div>
+
+        <!-- New product details fields -->
+        <div class="mt-4">
+          <label for="productName">
+            <span class="text-l text-center">Product Name</span>
+          </label>
+          <input
+            id="productName"
+            name="productName"
+            type="text"
+            placeholder="Product name"
+            class="{fieldError(form, 'productName')
+              ? 'input-error'
+              : ''} mt-1 input input-bordered w-full max-w-xs"
+            bind:value={productName}
+          />
+        </div>
+
+        <div class="mt-4">
+          <label for="productDescription">
+            <span class="text-l text-center">Product Description</span>
+          </label>
+          <textarea
+            id="productDescription"
+            name="productDescription"
+            placeholder="Describe your product"
+            class="{fieldError(form, 'productDescription')
+              ? 'input-error'
+              : ''} mt-1 input input-bordered w-full max-w-xs"
+            bind:value={productDescription}
+          ></textarea>
+        </div>
+
+        <div class="mt-4">
+          <label for="productCost">
+            <span class="text-l text-center">Product Cost ($)</span>
+          </label>
+          <input
+            id="productCost"
+            name="productCost"
+            type="number"
+            step="0.01"
+            placeholder="0.00"
+            class="{fieldError(form, 'productCost')
+              ? 'input-error'
+              : ''} mt-1 input input-bordered w-full max-w-xs"
+            bind:value={productCost}
           />
         </div>
 

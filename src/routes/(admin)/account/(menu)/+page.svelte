@@ -2,6 +2,9 @@
   import { getContext } from "svelte"
   import type { Writable } from "svelte/store"
 
+  export let data
+  let { products } = data
+
   let adminSection: Writable<string> = getContext("adminSection")
   adminSection.set("home")
 </script>
@@ -37,6 +40,26 @@
     </div>
   </div>
 </div>
+
+<h1 class="text-3xl font-bold mb-6 text-gray-800">Your Products</h1>
+
+{#if products && products.length > 0}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {#each products as product}
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
+        <h2 class="text-xl font-semibold text-gray-900 mb-2">
+          {product.product_name}
+        </h2>
+        <p class="text-gray-700 mb-4">{product.description}</p>
+        <p class="text-lg font-semibold text-blue-600">
+          Cost: ${product.product_cost}
+        </p>
+      </div>
+    {/each}
+  </div>
+{:else}
+  <div class="text-gray-700">You have not added any products yet.</div>
+{/if}
 
 <div class="my-6">
   <h1 class="text-xl font-bold mb-1">Users</h1>
