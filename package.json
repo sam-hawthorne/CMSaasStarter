@@ -15,7 +15,7 @@
 		"format_check": "prettier --check --plugin prettier-plugin-svelte ./src"
 	},
 	"devDependencies": {
-		"@sveltejs/adapter-auto": "^2.0.0",
+		"@sveltejs/adapter-cloudflare": "^2.3.4",
 		"@sveltejs/kit": "^1.30.4",
 		"@tailwindcss/typography": "^0.5.10",
 		"@typescript-eslint/eslint-plugin": "^6.20.0",

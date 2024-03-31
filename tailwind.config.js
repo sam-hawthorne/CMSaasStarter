@@ -10,6 +10,7 @@ export default {
   ],
   daisyui: {
     themes: [
+      "lofi",
       {
         saasstartertheme: {
           "primary": "#180042",
